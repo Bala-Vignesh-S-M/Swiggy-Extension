@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Swiggy Order Analytics</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero-text">
+        <h1>Swiggy Order Analytics</h1>
+        <p class="tagline">Spending, restaurants, and dishes — from your Swiggy account only.</p>
+      </div>
+      <div class="hero-stats" id="heroStats">
+        <div class="stat">
+          <span class="stat-label">Tracked spend</span>
+          <span class="stat-value" id="totalSpend">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Orders</span>
+          <span class="stat-value" id="orderCount">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Avg order</span>
+          <span class="stat-value" id="aov">—</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <button type="button" id="btnFetchPage" class="btn primary toolbar-btn">Fetch from page</button>
+      <button type="button" id="btnAutoScroll" class="btn toolbar-btn">Auto-scroll</button>
+      <button type="button" id="btnRefresh" class="btn toolbar-btn">Refresh</button>
+    </div>
+    <p class="sync-status" id="syncStatus"></p>
+
+    <section class="hint" id="hint">
+      <strong>Sync without scrolling everything</strong>
+      <p>
+        Stay on a logged-in <strong>swiggy.com</strong> tab (orders or home). Click
+        <strong>Fetch from page</strong> — we call Swiggy’s own JSON endpoints with your session. Then
+        <strong>Refresh</strong>. Use <strong>Auto-scroll</strong> only if fetch adds nothing. Data stays on
+        this device.
+      </p>
+    </section>
+
+    <nav class="tabs" role="tablist">
+      <button type="button" class="tab active" data-tab="overview" role="tab" aria-selected="true">Overview</button>
+      <button type="button" class="tab" data-tab="places" role="tab">Restaurants</button>
+      <button type="button" class="tab" data-tab="dishes" role="tab">Dishes</button>
+      <button type="button" class="tab" data-tab="insights" role="tab">Insights</button>
+      <button type="button" class="tab" data-tab="import" role="tab">Import</button>
+    </nav>
+
+    <main>
+      <section id="panel-overview" class="panel active" role="tabpanel">
+        <!-- <div class="chart-wrap chart-fixed">
+          <h2>Spend by month</h2>
+          <canvas id="chartMonths" width="380" height="150"></canvas>
+        </div> -->
+        <div class="table-wrap">
+          <h2>Monthly spend (table)</h2>
+          <table class="data-table" id="monthTable" hidden>
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th class="num">Spend</th>
+              </tr>
+            </thead>
+            <tbody id="monthTableBody"></tbody>
+          </table>
+          <p class="empty-hint" id="monthEmptyHint" hidden>No dated orders — dates may be missing from captured data.</p>
+        </div>
+        <!-- <div class="chart-row">
+          <div class="chart-wrap half chart-fixed">
+            <h2>Orders by weekday</h2>
+            <canvas id="chartWeekday" width="180" height="160"></canvas>
+          </div>
+          <div class="chart-wrap half chart-fixed">
+            <h2>Cuisine guess</h2>
+            <canvas id="chartCuisine" width="180" height="160"></canvas>
+          </div>
+        </div> -->
+      </section>
+
+      <section id="panel-places" class="panel" role="tabpanel" hidden>
+        <p class="empty-hint" id="restEmptyHint" hidden>No restaurants in stored orders.</p>
+        <div class="list-block">
+          <h2>Top restaurants by spend</h2>
+          <ol class="ranked-list" id="listRestSpend"></ol>
+        </div>
+        <div class="list-block">
+          <h2>Most frequent restaurants</h2>
+          <ol class="ranked-list" id="listRestFreq"></ol>
+        </div>
+      </section>
+
+      <section id="panel-dishes" class="panel" role="tabpanel" hidden>
+        <p class="empty-hint" id="dishEmptyHint" hidden>
+          No dish names in stored line items. Fetch / open order details on Swiggy, or Import JSON with
+          <code>items</code>.
+        </p>
+        <div class="list-block">
+          <h2>Dishes you order most</h2>
+          <ol class="ranked-list" id="listDishes"></ol>
+        </div>
+      </section>
+
+      <section id="panel-insights" class="panel" role="tabpanel" hidden>
+        <ul class="insight-list" id="insightList"></ul>
+      </section>
+
+      <section id="panel-import" class="panel" role="tabpanel" hidden>
+        <p class="import-copy">
+          Merge a JSON array of orders. Each row should include <code>restaurant</code>, <code>total</code>,
+          <code>orderedAt</code> (ISO or unix), and optional <code>items</code>.
+        </p>
+        <textarea id="importJson" rows="8" placeholder='[{"platform":"swiggy","restaurant":"…","total":299,"orderedAt":"2026-01-15","items":[{"name":"Masala dosa","qty":1}]}]'></textarea>
+        <div class="import-actions">
+          <button type="button" id="btnImport" class="btn primary">Merge import</button>
+          <button type="button" id="btnSample" class="btn">Load demo data</button>
+          <button type="button" id="btnClear" class="btn danger">Clear all data</button>
+        </div>
+        <p id="importStatus" class="status"></p>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <span id="metaLine"></span>
+    </footer>
+
+    <script src="chart.umd.min.js"></script>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
